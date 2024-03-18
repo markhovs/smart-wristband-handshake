@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'screens/profile_screen.dart';
-import 'screens/contacts_screen.dart';
+import 'screens/home_screen.dart';
 import 'services/database_helper.dart';
-
+// Desktop platform specific imports
+import 'dart:io';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
@@ -33,14 +32,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Smart Wristband App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Colors.amber, // Example secondary color
+        ),
       ),
-      home: ProfileScreen(),
-      routes: {
-        '/profile': (context) => ProfileScreen(),
-        '/contacts': (context) => ContactsScreen(),
-      },
+      home: HomeScreen(), // Set HomeScreen as the new home of the app
     );
   }
 }

@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/business_card.dart';
-// Import `sqflite_common_ffi` only if the platform is not iOS or Android
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseHelper {
   static final _databaseName = "SmartWristbandDatabase.db";
@@ -23,6 +23,9 @@ class DatabaseHelper {
   static final columnCompany = 'company';
   static final columnPosition = 'position';
   static final columnDescription = 'description';
+  // New timestamp columns
+  static final columnCreatedAt = 'createdAt';
+  static final columnUpdatedAt = 'updatedAt';
 
   // Singleton pattern
   DatabaseHelper._privateConstructor();
@@ -30,9 +33,7 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database == null) {
-      // Check if you're running on a platform that isn't iOS or Android.
       if (!Platform.isIOS && !Platform.isAndroid && !kIsWeb) {
-        // Initialize sqflite_common_ffi for non-mobile platforms.
         sqfliteFfiInit();
         _database = await databaseFactoryFfi.openDatabase(
           join(await getDatabasesPath(), _databaseName),
@@ -42,7 +43,6 @@ class DatabaseHelper {
           ),
         );
       } else {
-        // For mobile platforms, proceed with the standard initialization.
         String path = join(await getDatabasesPath(), _databaseName);
         _database = await openDatabase(
           path,
@@ -54,9 +54,8 @@ class DatabaseHelper {
     return _database!;
   }
 
-  // CRUD operations as before...
   Future _onCreate(Database db, int version) async {
-    // Create the personal business card table
+    // Create the personal business card table with createdAt and updatedAt fields
     await db.execute('''
       CREATE TABLE $tablePersonal (
         $columnId INTEGER PRIMARY KEY,
@@ -67,11 +66,13 @@ class DatabaseHelper {
         $columnLinkedIn TEXT,
         $columnCompany TEXT,
         $columnPosition TEXT,
-        $columnDescription TEXT
+        $columnDescription TEXT,
+        $columnCreatedAt TEXT NOT NULL,
+        $columnUpdatedAt TEXT NOT NULL
       )
     ''');
 
-    // Create the contacts business card table
+    // Create the contacts business card table with createdAt and updatedAt fields
     await db.execute('''
       CREATE TABLE $tableContacts (
         $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -82,32 +83,46 @@ class DatabaseHelper {
         $columnLinkedIn TEXT,
         $columnCompany TEXT,
         $columnPosition TEXT,
-        $columnDescription TEXT
+        $columnDescription TEXT,
+        $columnCreatedAt TEXT NOT NULL,
+        $columnUpdatedAt TEXT NOT NULL
       )
     ''');
   }
 
-  // Insert a personal business card (update if exists to maintain only a single personal card)
+  // Insert or update personal business card with timestamp handling
   Future<void> insertOrUpdatePersonalCard(BusinessCard card) async {
     Database db = await instance.database;
+    String timestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    var cardMap = card.toMap();
+    cardMap[columnCreatedAt] = cardMap[columnUpdatedAt] = timestamp;
+
     var existingCards = await db.query(tablePersonal);
     if (existingCards.isEmpty) {
-      // Insert new if none exists
-      await db.insert(tablePersonal, card.toMap());
+      await db.insert(tablePersonal, cardMap);
     } else {
-      // Update the existing card (assuming only one record is there)
-      // Ensure we use the existing `id` and do not set it to `null`
       var existingId = existingCards.first[columnId];
+      cardMap[columnUpdatedAt] = timestamp;
       await db.update(
         tablePersonal,
-        card.toMap(),
+        cardMap,
         where: '$columnId = ?',
-        whereArgs: [existingId], // Pass the correct `id`
+        whereArgs: [existingId],
       );
     }
   }
 
-  // Get the personal business card
+  // Insert received business card with current timestamp
+  Future<void> insertContactCard(BusinessCard card) async {
+    Database db = await instance.database;
+    String timestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    var cardMap = card.toMap();
+    cardMap[columnCreatedAt] = cardMap[columnUpdatedAt] = timestamp;
+
+    await db.insert(tableContacts, cardMap, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
+  // Retrieve the personal business card
   Future<BusinessCard?> getPersonalCard() async {
     Database db = await instance.database;
     List<Map> maps = await db.query(tablePersonal);
@@ -117,13 +132,7 @@ class DatabaseHelper {
     return null;
   }
 
-  // Insert a received business card
-  Future<void> insertContactCard(BusinessCard card) async {
-    Database db = await instance.database;
-    await db.insert(tableContacts, card.toMap(), conflictAlgorithm: ConflictAlgorithm.ignore);
-  }
-
-  // Get all received business cards
+  // Retrieve all received business cards
   Future<List<BusinessCard>> getAllContactCards() async {
     Database db = await instance.database;
     List<Map> maps = await db.query(tableContacts);
@@ -131,6 +140,4 @@ class DatabaseHelper {
       return BusinessCard.fromMap(Map<String, dynamic>.from(maps[i]));
     });
   }
-
-  // Update and delete methods can be implemented similarly, as needed.
 }
