@@ -74,3 +74,40 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Additions for Flutter/Dart development
+
+# General Flutter/Dart build outputs
+/build/
+**/build/
+**/.dart_tool/
+/.packages
+/pubspec.lock
+
+# iOS specific for Flutter
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/.symlinks/
+**/ios/.generated/
+**/ios/Flutter/FlutterPluginRegistrant/
+**/ios/Pods/
+
+# Android specific for Flutter
+**/android/.gradle
+**/android/app/.cxx/
+**/android/keystore.properties
+**/android/local.properties
+/android/app/build/
+
+# Avoid tracking MacOS files
+**/.DS_Store
+
+# IDE specific files
+**/.idea/
+*.iml
+
+# Temp files
+**/*.swp
+**/*~
+**/._*
