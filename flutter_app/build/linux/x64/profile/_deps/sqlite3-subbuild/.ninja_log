@@ -1,0 +1,21 @@
+# ninja log v5
+0	22	1710801243072853360	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir	9a182bae3885f9d0
+0	22	1710801243072853360	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-mkdir	9a182bae3885f9d0
+22	2109	1710801245159520134	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download	341848cebd75da40
+22	2109	1710801245159520134	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-download	341848cebd75da40
+2109	2132	1710801245182853468	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update	168b1974a722ffd4
+2109	2132	1710801245182853468	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-update	168b1974a722ffd4
+2132	2154	1710801245206186803	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch	9046c549caf72c0f
+2132	2154	1710801245206186803	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-patch	9046c549caf72c0f
+2155	2175	1710801245226186804	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure	8fa04b1acf70b73c
+2155	2175	1710801245226186804	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-configure	8fa04b1acf70b73c
+2175	2198	1710801245249520138	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build	893678217bfa78fa
+2175	2198	1710801245249520138	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-build	893678217bfa78fa
+2198	2219	1710801245269520139	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install	7f21cc6d5b7eb710
+2198	2219	1710801245269520139	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-install	7f21cc6d5b7eb710
+2219	2245	1710801245296186807	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test	ae86a3c413ab6caf
+2219	2245	1710801245296186807	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-test	ae86a3c413ab6caf
+2245	2278	1710801245329520143	CMakeFiles/sqlite3-populate-complete	b4b0386293805e96
+2245	2278	1710801245329520143	sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-done	b4b0386293805e96
+2245	2278	1710801245329520143	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/CMakeFiles/sqlite3-populate-complete	b4b0386293805e96
+2245	2278	1710801245329520143	/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/_deps/sqlite3-subbuild/sqlite3-populate-prefix/src/sqlite3-populate-stamp/sqlite3-populate-done	b4b0386293805e96

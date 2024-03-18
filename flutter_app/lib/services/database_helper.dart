@@ -1,31 +1,30 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import '../models/business_card.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:intl/intl.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "SmartWristbandDatabase.db";
-  static final _databaseVersion = 1;
-  static final tablePersonal = 'personal_business_card';
-  static final tableContacts = 'contacts_business_card';
+  static const _databaseName = "SmartWristbandDatabase.db";
+  static const _databaseVersion = 1;
+  static const tablePersonal = 'personal_business_card';
+  static const tableContacts = 'contacts_business_card';
   static Database? _database;
 
   // Columns for both tables
-  static final columnId = 'id';
-  static final columnFirstName = 'firstName';
-  static final columnLastName = 'lastName';
-  static final columnPhoneNumber = 'phoneNumber';
-  static final columnEmail = 'email';
-  static final columnLinkedIn = 'linkedIn';
-  static final columnCompany = 'company';
-  static final columnPosition = 'position';
-  static final columnDescription = 'description';
+  static const columnId = 'id';
+  static const columnFirstName = 'firstName';
+  static const columnLastName = 'lastName';
+  static const columnPhoneNumber = 'phoneNumber';
+  static const columnEmail = 'email';
+  static const columnLinkedIn = 'linkedIn';
+  static const columnCompany = 'company';
+  static const columnPosition = 'position';
+  static const columnDescription = 'description';
   // New timestamp columns
-  static final columnCreatedAt = 'createdAt';
-  static final columnUpdatedAt = 'updatedAt';
+  static const columnCreatedAt = 'createdAt';
+  static const columnUpdatedAt = 'updatedAt';
 
   // Singleton pattern
   DatabaseHelper._privateConstructor();

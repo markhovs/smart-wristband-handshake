@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'contact_details_screen.dart';
 import '../models/business_card.dart';
-import '../screens/contact_details.dart';
+import '../models/settings.dart';
 import '../services/database_helper.dart';
-import '../services/ble_helper.dart'; // Adjusted import based on your context
+import '../services/ble_helper.dart';
 
 class ContactsScreen extends StatefulWidget {
+  const ContactsScreen({Key? key}) : super(key: key);
+
   @override
   _ContactsScreenState createState() => _ContactsScreenState();
 }
@@ -35,9 +39,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   void _startListeningToBLE() {
     _contactSubscription = _bleService.contactStream.listen((newContact) async {
+      // Access the settings model
+      final settingsModel = Provider.of<SettingsModel>(context, listen: false);
       String receptionTimestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-      bool confirm = await _showConfirmationDialog(newContact, receptionTimestamp);
-      if (confirm) {
+
+      // Check the setting before deciding to show the dialog
+      if (settingsModel.approveContacts) {
+        bool confirm = await _showConfirmationDialog(newContact, receptionTimestamp);
+        if (confirm) {
+          _addContact(newContact, receptionTimestamp);
+        }
+      } else {
         _addContact(newContact, receptionTimestamp);
       }
     });
@@ -48,16 +60,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Confirm Contact'),
+              title: const Text('Confirm Contact'),
               content: Text(
                   'Would you like to add ${contact.firstName} ${contact.lastName} received at $timestamp to your list?'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                   onPressed: () => Navigator.of(context).pop(false),
                 ),
                 TextButton(
-                  child: Text('Add'),
+                  child: const Text('Add'),
                   onPressed: () => Navigator.of(context).pop(true),
                 ),
               ],
@@ -83,8 +95,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Widget _buildContactList() {
-    if (_isLoading) return Center(child: CircularProgressIndicator());
-    if (_contacts.isEmpty) return Center(child: Text('No contacts received yet.'));
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_contacts.isEmpty) return const Center(child: Text('No contacts received yet.'));
 
     return ListView.builder(
       itemCount: _contacts.length,
@@ -95,11 +107,13 @@ class _ContactsScreenState extends State<ContactsScreen> {
             title: Text('${contact.firstName} ${contact.lastName}'),
             subtitle: Text('${contact.email}\nReceived at: ${contact.createdAt}'),
             isThreeLine: true,
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              print("List item tapped");
+              // Remove the print statement and navigate to the detail screen
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => Scaffold(appBar: AppBar(title: Text('Simple Test')))),
+                MaterialPageRoute(
+                  builder: (context) => ContactDetailScreen(contact: contact),
+                ),
               );
             },
           ),
@@ -112,10 +126,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Received Contacts'),
+        title: const Text('Received Contacts'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: _loadContacts,
           ),
         ],
@@ -124,7 +138,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _bleService.simulateContactReception,
         tooltip: 'Simulate Contact Reception',
-        child: Icon(Icons.bluetooth_searching),
+        child: const Icon(Icons.bluetooth_searching),
       ),
     );
   }

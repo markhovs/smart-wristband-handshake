@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
+import 'models/settings.dart';
 import 'services/database_helper.dart';
 // Desktop platform specific imports
 import 'dart:io';
@@ -23,10 +25,17 @@ void main() async {
     // You might choose to display an error message or take other actions here
   }
 
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SettingsModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,7 +47,7 @@ class MyApp extends StatelessWidget {
           secondary: Colors.amber, // Example secondary color
         ),
       ),
-      home: HomeScreen(), // Set HomeScreen as the new home of the app
+      home: const HomeScreen(), // Set HomeScreen as the new home of the app
     );
   }
 }

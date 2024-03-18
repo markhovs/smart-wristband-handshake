@@ -2,6 +2,7 @@
 /home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/data/icudtl.dat
 /home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/lib/libflutter_linux_gtk.so
 /home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/lib/libsqlite3_flutter_libs_plugin.so
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/lib/liburl_launcher_linux_plugin.so
 /home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.bin
 /home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/data/flutter_assets/kernel_blob.bin
 /home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.json

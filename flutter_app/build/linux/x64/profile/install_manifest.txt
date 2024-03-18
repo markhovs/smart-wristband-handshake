@@ -1,0 +1,16 @@
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/flutter_app
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/icudtl.dat
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/lib/libflutter_linux_gtk.so
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/lib/libsqlite3_flutter_libs_plugin.so
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/lib/liburl_launcher_linux_plugin.so
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/AssetManifest.bin
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/AssetManifest.json
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/FontManifest.json
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/NOTICES.Z
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/NOTICES
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/fonts/MaterialIcons-Regular.otf
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/shaders/ink_sparkle.frag
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/version.json
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/data/flutter_assets/AssetManifest.bin.json
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/profile/bundle/lib/libapp.so

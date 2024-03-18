@@ -21,14 +21,14 @@ class MockBLEService {
     final lastNames = ['Smith', 'Johnson', 'Williams'];
     final phones = ['123-456-7890', '987-654-3210', '654-321-9870'];
     final emails = ['alice@example.com', 'bob@example.com', 'charlie@example.com'];
-    Random _random = Random();
+    Random random = Random();
     String timestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
     return BusinessCard(
-      firstName: names[_random.nextInt(names.length)],
-      lastName: lastNames[_random.nextInt(lastNames.length)],
-      phoneNumber: phones[_random.nextInt(phones.length)],
-      email: emails[_random.nextInt(emails.length)],
+      firstName: names[random.nextInt(names.length)],
+      lastName: lastNames[random.nextInt(lastNames.length)],
+      phoneNumber: phones[random.nextInt(phones.length)],
+      email: emails[random.nextInt(emails.length)],
       linkedIn: '',
       company: '',
       position: '',

@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/settings.dart'; // Ensure this path is correct
 
 class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: ListView(
         children: <Widget>[
-          // Add your settings options here
           SwitchListTile(
-            title: Text('Connect Device'),
-            value: true, // This should be managed by a stateful logic e.g., with Provider or setState
+            title: const Text('Approve Contacts'),
+            value: settingsModel.approveContacts,
             onChanged: (bool value) {
-              // Update the state with the new value
+              settingsModel.toggleApproveContacts();
             },
           ),
           ListTile(
-            title: Text('Sharing Preferences'),
+            title: const Text('Sharing Preferences'),
             onTap: () {
-              // Navigate to account settings
+              // Here you would navigate to a different screen for sharing preferences.
+              // Navigator.of(context).push(MaterialPageRoute(builder: (_) => SharingPreferencesScreen()));
             },
           ),
-          // Add more settings options as ListTile or other widgets
+          // Additional settings options can be added here.
         ],
       ),
     );
