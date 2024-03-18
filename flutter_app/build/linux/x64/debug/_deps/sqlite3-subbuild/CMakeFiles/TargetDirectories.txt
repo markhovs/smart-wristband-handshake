@@ -1,0 +1,3 @@
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/_deps/sqlite3-subbuild/CMakeFiles/sqlite3-populate.dir
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/_deps/sqlite3-subbuild/CMakeFiles/edit_cache.dir
+/home/owl/Programming/smart-wristband-handshake/flutter_app/build/linux/x64/debug/_deps/sqlite3-subbuild/CMakeFiles/rebuild_cache.dir
