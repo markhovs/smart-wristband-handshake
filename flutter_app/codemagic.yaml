@@ -1,0 +1,29 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 120
+    environment:
+      vars:
+        LC_ALL: en_US.UTF-8
+      flutter: stable
+    scripts:
+      - name: Move to the Flutter app directory
+        script: cd flutter_app
+      - name: Get Flutter packages
+        script: flutter packages pub get
+      - name: Install pods
+        script: |
+          cd ios
+          pod install
+          cd ..
+      - name: Flutter build ipa
+        script: flutter build ipa --release
+    artifacts:
+      - flutter_app/build/ios/ipa/*.ipa
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+        notify:
+          success: true
+          failure: true
