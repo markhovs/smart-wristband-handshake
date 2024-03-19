@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:intl/intl.dart';
 import '../models/business_card.dart';
 
-class MockBLEService {
+class BLEService {
   final StreamController<BusinessCard> _contactStreamController = StreamController<BusinessCard>.broadcast();
+  final FlutterBlue _flutterBlue = FlutterBlue.instance;
+  StreamSubscription? _scanSubscription; // Define _scanSubscription here
 
   Stream<BusinessCard> get contactStream => _contactStreamController.stream;
 
-  MockBLEService();
+  BLEService();
 
   void simulateContactReception() {
     final BusinessCard contact = _generateRandomBusinessCard();
@@ -16,7 +19,6 @@ class MockBLEService {
   }
 
   BusinessCard _generateRandomBusinessCard() {
-    // Generating mock data for the sake of simulation
     final names = ['Alice', 'Bob', 'Charlie'];
     final lastNames = ['Smith', 'Johnson', 'Williams'];
     final phones = ['123-456-7890', '987-654-3210', '654-321-9870'];
@@ -38,7 +40,30 @@ class MockBLEService {
     );
   }
 
+  Future<List<String>> startBLEScan() async {
+    List<String> deviceNames = [];
+    await _flutterBlue.startScan(timeout: Duration(seconds: 4));
+
+    _scanSubscription = _flutterBlue.scanResults.listen((results) {
+      for (ScanResult result in results) {
+        // Collecting device names, not the devices themselves
+        deviceNames.add(result.device.name.isEmpty ? 'Unknown Device' : result.device.name);
+      }
+    });
+
+    await Future.delayed(Duration(seconds: 4)); // Wait for scan to finish
+    _flutterBlue.stopScan();
+    return deviceNames; // Returning names, not BluetoothDevice objects
+  }
+
+  void stopBLEScan() {
+    _scanSubscription?.cancel();
+    _flutterBlue.stopScan();
+  }
+
   void dispose() {
     _contactStreamController.close();
+    stopBLEScan();
+    _scanSubscription?.cancel();
   }
 }

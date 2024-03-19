@@ -18,7 +18,7 @@ class ContactsScreen extends StatefulWidget {
 class _ContactsScreenState extends State<ContactsScreen> {
   List<BusinessCard> _contacts = [];
   late StreamSubscription<BusinessCard> _contactSubscription;
-  final MockBLEService _bleService = MockBLEService();
+  final BLEService _bleService = BLEService();
   bool _isLoading = false; // For indicating loading status
 
   @override
@@ -38,17 +38,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   void _startListeningToBLE() {
-    _contactSubscription = _bleService.contactStream.listen((newContact) async {
-      // Access the settings model
+    _contactSubscription = _bleService.contactStream.listen((newContact) {
       final settingsModel = Provider.of<SettingsModel>(context, listen: false);
       String receptionTimestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
-      // Check the setting before deciding to show the dialog
       if (settingsModel.approveContacts) {
-        bool confirm = await _showConfirmationDialog(newContact, receptionTimestamp);
-        if (confirm) {
-          _addContact(newContact, receptionTimestamp);
-        }
+        _showConfirmationDialog(newContact, receptionTimestamp).then((confirmed) {
+          if (confirmed) {
+            _addContact(newContact, receptionTimestamp);
+          }
+        });
       } else {
         _addContact(newContact, receptionTimestamp);
       }
@@ -95,8 +94,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Widget _buildContactList() {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_contacts.isEmpty) return const Center(child: Text('No contacts received yet.'));
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_contacts.isEmpty) {
+      return const Center(child: Text('No contacts received yet.'));
+    }
 
     return ListView.builder(
       itemCount: _contacts.length,
@@ -108,21 +111,41 @@ class _ContactsScreenState extends State<ContactsScreen> {
             subtitle: Text('${contact.email}\nReceived at: ${contact.createdAt}'),
             isThreeLine: true,
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // Remove the print statement and navigate to the detail screen
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ContactDetailScreen(contact: contact),
-                ),
-              );
-            },
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => ContactDetailScreen(contact: contact)),
+            ),
           ),
         );
       },
     );
   }
 
-  @override
+  void _showDeviceList() async {
+    List<String> deviceNames = await _bleService.startBLEScan(); // Getting names
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Available Bluetooth Devices'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: deviceNames.map((name) => Text(name)).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -136,9 +159,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
       ),
       body: _buildContactList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _bleService.simulateContactReception,
-        tooltip: 'Simulate Contact Reception',
-        child: const Icon(Icons.bluetooth_searching),
+        onPressed: _showDeviceList,
+        tooltip: 'Show Bluetooth Devices',
+        heroTag: 'show_ble_devices',
+        child: const Icon(Icons.bluetooth),
       ),
     );
   }
