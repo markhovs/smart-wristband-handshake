@@ -7,23 +7,27 @@ workflows:
         LC_ALL: en_US.UTF-8
       flutter: stable
     scripts:
-      - name: Move to the Flutter app directory
-        script: cd flutter_app
       - name: Get Flutter packages
-        script: flutter packages pub get
+        script: |
+          cd flutter_app
+          flutter packages pub get
       - name: Install pods
         script: |
-          cd ios
+          cd flutter_app/ios
           pod install
           cd ..
+      - name: Flutter analyze
+        script: |
+          cd flutter_app
+          flutter analyze
+      - name: Flutter unit tests
+        script: |
+          cd flutter_app
+          flutter test
+        ignore_failure: true
       - name: Flutter build ipa
-        script: flutter build ipa --release
+        script: |
+          cd flutter_app
+          flutter build ipa --release
     artifacts:
       - flutter_app/build/ios/ipa/*.ipa
-    publishing:
-      email:
-        recipients:
-          - user@example.com
-        notify:
-          success: true
-          failure: true
