@@ -16,12 +16,14 @@ extension FirstWhereOrNullExtension<E> on Iterable<E> {
 class BLEService {
   final FlutterBlue _flutterBlue = FlutterBlue.instance;
   final String targetDeviceId = 'hardcoded_device_id';
+  final String sourceDeviceId = 'hardcoded_device_id';
   final String writeServiceUuid = 'write_service_uuid';
   final String writeCharacteristicUuid = 'write_characteristic_uuid';
   final String readServiceUuid = 'read_service_uuid';
   final String readCharacteristicUuid = 'read_characteristic_uuid';
 
   BluetoothDevice? _targetDevice;
+  BluetoothDevice? _sourceDevice;
   StreamSubscription? _scanSubscription;
 
   Future<void> startBLEScan() async {
@@ -31,6 +33,10 @@ class BLEService {
       for (ScanResult result in results) {
         if (result.device.id.id == targetDeviceId) {
           _targetDevice = result.device;
+          break;
+        }
+        if (result.device.id.id == sourceDeviceId) {
+          _sourceDevice = result.device;
           break;
         }
       }
@@ -74,7 +80,7 @@ class BLEService {
 
     if (_targetDevice == null) return null;
 
-    List<BluetoothService> services = await _targetDevice!.discoverServices();
+    List<BluetoothService> services = await _sourceDevice!.discoverServices();
     BluetoothService? service = services.firstWhereOrNull((s) => s.uuid.toString() == readServiceUuid);
     BluetoothCharacteristic? characteristic =
         service?.characteristics.firstWhereOrNull((c) => c.uuid.toString() == readCharacteristicUuid);

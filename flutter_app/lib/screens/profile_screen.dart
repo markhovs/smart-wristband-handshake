@@ -62,9 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _saveProfile();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile saved!')));
 
-      // We don't initialize BLE here anymore to avoid immediate operations.
       if (_personalCard != null) {
-        // Show a loading indicator to inform the user that BLE is starting
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -85,21 +83,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         );
 
-        // Call BLE service to send the profile asynchronously
         bool sentSuccessfully = await _bleService.sendPersonalProfile(_personalCard!);
-
-        // Dismiss the loading indicator
         Navigator.of(context).pop();
 
-        // Show the result of the BLE operation
         if (sentSuccessfully) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile sent via BLE')));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to send profile via BLE')));
         }
+
+        // Exit edit mode after all operations are complete.
+        setState(() {
+          _isEditMode = false;
+        });
       }
     } else {
-      setState(() => _isEditMode = true);
+      // Enable edit mode if not currently editing.
+      setState(() {
+        _isEditMode = true;
+      });
     }
   }
 

@@ -123,8 +123,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
             subtitle: Text('${contact.email}\nReceived at: ${contact.createdAt}'),
             isThreeLine: true,
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => ContactDetailScreen(contact: contact))),
+            onTap: () async {
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ContactDetailScreen(contact: contact),
+                ),
+              );
+              // Check if the 'deleted' signal is sent back
+              if (result == 'deleted') {
+                // A contact has been deleted, so refresh the contact list.
+                _loadContacts();
+              }
+            },
           ),
         );
       },
