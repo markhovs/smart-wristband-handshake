@@ -34,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _initializeProfile();
-    _bleService.initialize(); // Initialize BLE service to prepare for operations.
   }
 
   Future<void> _initializeProfile() async {
@@ -63,19 +62,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _saveProfile();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile saved!')));
 
+      // We don't initialize BLE here anymore to avoid immediate operations.
       if (_personalCard != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sending profile via BLE...')));
+        // Show a loading indicator to inform the user that BLE is starting
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 24),
+                    Text("Sending profile via BLE..."),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
 
+        // Call BLE service to send the profile asynchronously
         bool sentSuccessfully = await _bleService.sendPersonalProfile(_personalCard!);
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
+        // Dismiss the loading indicator
+        Navigator.of(context).pop();
+
+        // Show the result of the BLE operation
         if (sentSuccessfully) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile sent via BLE')));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to send profile via BLE')));
         }
-
-        setState(() => _isEditMode = false);
       }
     } else {
       setState(() => _isEditMode = true);

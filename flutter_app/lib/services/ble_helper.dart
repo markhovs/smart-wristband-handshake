@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:intl/intl.dart';
 import '../models/business_card.dart';
@@ -24,12 +25,8 @@ class BLEService {
   BluetoothDevice? _targetDevice;
   StreamSubscription? _scanSubscription;
 
-  Future<void> initialize() async {
-    await startBLEScan();
-  }
-
   Future<void> startBLEScan() async {
-    await _flutterBlue.startScan(timeout: Duration(seconds: 10));
+    await _flutterBlue.startScan(timeout: Duration(seconds: 1));
 
     _scanSubscription = _flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
@@ -40,7 +37,7 @@ class BLEService {
       }
     });
 
-    await Future.delayed(Duration(seconds: 10));
+    await Future.delayed(Duration(seconds: 1));
     await _flutterBlue.stopScan();
 
     if (_targetDevice != null) {
@@ -51,6 +48,8 @@ class BLEService {
   }
 
   Future<bool> sendPersonalProfile(BusinessCard profile) async {
+    await startBLEScan();
+
     if (_targetDevice == null) return false;
 
     List<BluetoothService> services = await _targetDevice!.discoverServices();
@@ -72,6 +71,8 @@ class BLEService {
   }
 
   Future<BusinessCard?> receiveContactData() async {
+    await startBLEScan();
+
     if (_targetDevice == null) return null;
 
     List<BluetoothService> services = await _targetDevice!.discoverServices();
@@ -95,25 +96,24 @@ class BLEService {
   }
 
   List<int> _convertProfileToData(BusinessCard profile) {
-    var json = jsonEncode({
-      'firstName': profile.firstName,
-      'lastName': profile.lastName,
-      // Add other fields as necessary
-    });
-    return utf8.encode(json);
+    // Convert the firstName to a list of ASCII values (byte array)
+    List<int> firstNameBytes = ascii.encode(profile.firstName);
+    return firstNameBytes;
   }
 
   BusinessCard? _convertDataToBusinessCard(List<int> value) {
     try {
-      var json = jsonDecode(utf8.decode(value));
+      // Decode the byte array into an ASCII string for the first name
+      String asciiFirstName = ascii.decode(value);
+
+      // Create the BusinessCard with the ASCII first name and placeholders for other fields
       return BusinessCard(
-        firstName: json['firstName'] ?? 'Unknown',
-        lastName: json['lastName'] ?? 'Unknown',
-        phoneNumber: json['phoneNumber'] ?? 'Unknown',
-        email: json['email'] ?? 'Unknown',
+        firstName: asciiFirstName,
+        lastName: 'Placeholder',
+        phoneNumber: 'Placeholder',
+        email: 'Placeholder',
         createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         updatedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-        // Add other fields as necessary, provide default values or handle null
       );
     } catch (e) {
       print('Error converting data: $e');

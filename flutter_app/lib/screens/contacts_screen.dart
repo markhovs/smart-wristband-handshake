@@ -24,7 +24,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
   void initState() {
     super.initState();
     _loadContacts();
-    // No need to start listening to BLE here as it is handled on button press.
   }
 
   Future<void> _loadContacts() async {
