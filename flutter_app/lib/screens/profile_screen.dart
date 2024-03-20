@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/business_card.dart';
 import '../services/database_helper.dart';
+import '../services/ble_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -14,7 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isEditMode = false;
   BusinessCard? _personalCard;
-  bool _isLoading = true; // Indicate loading state initially
+  bool _isLoading = true;
 
   // Text Controllers
   final _firstNameController = TextEditingController();
@@ -26,10 +27,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _positionController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  // BLE Service
+  final BLEService _bleService = BLEService();
+
   @override
   void initState() {
     super.initState();
     _initializeProfile();
+    _bleService.initialize(); // Initialize BLE service to prepare for operations.
   }
 
   Future<void> _initializeProfile() async {
@@ -37,9 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_personalCard != null) {
       _setDataToControllers(_personalCard!);
     }
-    setState(() {
-      _isLoading = false; // Loading complete, update UI accordingly
-    });
+    setState(() => _isLoading = false);
   }
 
   void _setDataToControllers(BusinessCard card) {
@@ -53,30 +56,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _descriptionController.text = card.description;
   }
 
-  void _toggleEditMode() {
-    setState(() {
-      if (!_isEditMode && _personalCard != null) {
-        // When transitioning to edit mode, populate the text fields if there is profile data.
-        _setDataToControllers(_personalCard!);
-      }
-      _isEditMode = !_isEditMode;
-    });
-  }
+  void _toggleEditMode() => setState(() => _isEditMode = !_isEditMode);
 
-  void _createOrSaveProfile() {
+  void _createOrSaveProfile() async {
     if (_isEditMode && _formKey.currentState!.validate()) {
-      _saveProfile();
+      await _saveProfile();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile saved!')));
+
+      if (_personalCard != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sending profile via BLE...')));
+
+        bool sentSuccessfully = await _bleService.sendPersonalProfile(_personalCard!);
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+        if (sentSuccessfully) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile sent via BLE')));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to send profile via BLE')));
+        }
+
+        setState(() => _isEditMode = false);
+      }
     } else {
-      // If not in edit mode and there is no profile, switch to edit mode to create a new profile.
-      setState(() {
-        _isEditMode = true;
-      });
+      setState(() => _isEditMode = true);
     }
   }
 
-  void _saveProfile() async {
+  Future<void> _saveProfile() async {
     String currentTimestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-    // When creating a new profile, there won't be an existing ID or timestamps.
     final updatedCard = BusinessCard(
       firstName: _firstNameController.text,
       lastName: _lastNameController.text,
@@ -91,20 +98,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     await DatabaseHelper.instance.insertOrUpdatePersonalCard(updatedCard);
-    setState(() {
-      _personalCard = updatedCard;
-      _isEditMode = false; // Exit edit mode after saving.
-    });
+    setState(() => _personalCard = updatedCard);
 
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved!')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile saved!')));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your Profile'),
-      ),
+      appBar: AppBar(title: const Text('Your Profile')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : (_isEditMode || _personalCard == null ? _buildEditableView() : _buildReadOnlyView()),
@@ -116,15 +118,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildNoProfileView() {
-    // This view is now redundant as _buildEditableView handles the case.
-    return const Center(
-      child: Text('No profile available.'),
-    );
-  }
-
   Widget _buildReadOnlyView() {
-    if (_personalCard == null) return const Center(child: CircularProgressIndicator());
+    if (_personalCard == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return ListView(
       padding: const EdgeInsets.all(16),
       children: <Widget>[
@@ -149,41 +146,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: <Widget>[
               TextFormField(
-                  controller: _firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your first name' : null),
+                controller: _firstNameController,
+                decoration: const InputDecoration(labelText: 'First Name'),
+                validator: (value) => value!.isEmpty ? 'Please enter your first name' : null,
+              ),
               TextFormField(
-                  controller: _lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your last name' : null),
+                controller: _lastNameController,
+                decoration: const InputDecoration(labelText: 'Last Name'),
+                validator: (value) => value!.isEmpty ? 'Please enter your last name' : null,
+              ),
               TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your email' : null),
+                controller: _phoneNumberController,
+                decoration: const InputDecoration(labelText: 'Phone Number'),
+                validator: (value) => value!.isEmpty ? 'Please enter your phone number' : null,
+              ),
               TextFormField(
-                  controller: _phoneNumberController,
-                  decoration: const InputDecoration(labelText: 'Phone Number'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your phone number' : null),
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) => value!.isEmpty ? 'Please enter your email' : null,
+              ),
               TextFormField(
-                  controller: _linkedInController,
-                  decoration: const InputDecoration(labelText: 'LinkedIn'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your LinkedIn profile' : null),
+                controller: _linkedInController,
+                decoration: const InputDecoration(labelText: 'LinkedIn Profile'),
+                validator: (value) => value!.isEmpty ? 'Please enter your LinkedIn profile URL' : null,
+              ),
               TextFormField(
-                  controller: _companyController,
-                  decoration: const InputDecoration(labelText: 'Company'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your company' : null),
+                controller: _companyController,
+                decoration: const InputDecoration(labelText: 'Company'),
+                validator: (value) => value!.isEmpty ? 'Please enter your company' : null,
+              ),
               TextFormField(
-                  controller: _positionController,
-                  decoration: const InputDecoration(labelText: 'Position'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your position' : null),
+                controller: _positionController,
+                decoration: const InputDecoration(labelText: 'Position'),
+                validator: (value) => value!.isEmpty ? 'Please enter your position' : null,
+              ),
               TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  validator: (value) => value!.isEmpty ? 'Please enter your personal description' : null),
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: 'Description'),
+                validator: (value) => value!.isEmpty ? 'Please enter a description' : null,
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Dispose of controllers and the BLE service
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _phoneNumberController.dispose();
+    _emailController.dispose();
+    _linkedInController.dispose();
+    _companyController.dispose();
+    _positionController.dispose();
+    _descriptionController.dispose();
+    _bleService.dispose();
+    super.dispose();
   }
 }
