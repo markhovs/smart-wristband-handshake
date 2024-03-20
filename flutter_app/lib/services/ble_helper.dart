@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:intl/intl.dart';
 import '../models/business_card.dart';
