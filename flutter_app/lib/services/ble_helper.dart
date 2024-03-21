@@ -26,7 +26,7 @@ class BLEService {
   BluetoothDevice? _sourceDevice;
   StreamSubscription? _scanSubscription;
 
-  Future<void> startBLEScan() async {
+  Future<void> startBLEScan(bool write) async {
     await _flutterBlue.startScan(timeout: Duration(seconds: 1));
 
     _scanSubscription = _flutterBlue.scanResults.listen((results) {
@@ -45,15 +45,17 @@ class BLEService {
     await Future.delayed(Duration(seconds: 1));
     await _flutterBlue.stopScan();
 
-    if (_targetDevice != null) {
+    if (_targetDevice != null && write) {
       await _targetDevice!.connect();
+    } else if (_sourceDevice != null && !write) {
+      await _sourceDevice!.connect();
     } else {
       print('Target device not found');
     }
   }
 
   Future<bool> sendPersonalProfile(BusinessCard profile) async {
-    await startBLEScan();
+    await startBLEScan(true);
 
     if (_targetDevice == null) return false;
 
@@ -76,9 +78,9 @@ class BLEService {
   }
 
   Future<BusinessCard?> receiveContactData() async {
-    await startBLEScan();
+    await startBLEScan(false);
 
-    if (_targetDevice == null) return null;
+    if (_sourceDevice == null) return null;
 
     List<BluetoothService> services = await _sourceDevice!.discoverServices();
     BluetoothService? service = services.firstWhereOrNull((s) => s.uuid.toString() == readServiceUuid);
@@ -91,11 +93,11 @@ class BLEService {
       var receivedCard = _convertDataToBusinessCard(value);
       print('Contact received');
 
-      await _targetDevice!.disconnect();
+      await _sourceDevice!.disconnect();
       return receivedCard;
     } else {
       print('Read characteristic not found');
-      await _targetDevice!.disconnect();
+      await _sourceDevice!.disconnect();
       return null;
     }
   }

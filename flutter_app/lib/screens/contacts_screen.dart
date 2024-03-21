@@ -30,7 +30,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
     setState(() => _isLoading = true);
     List<BusinessCard> contactsList = await DatabaseHelper.instance.getAllContactCards();
     setState(() {
-      _contacts = contactsList;
+      _contacts.clear(); // Clear the current contact list before setting the new one
+      _contacts.addAll(contactsList);
       _isLoading = false;
     });
   }
