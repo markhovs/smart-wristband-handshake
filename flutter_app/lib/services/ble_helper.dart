@@ -27,7 +27,7 @@ class BLEService {
   StreamSubscription? _scanSubscription;
 
   Future<void> startBLEScan(bool write) async {
-    await _flutterBlue.startScan(timeout: Duration(seconds: 1));
+    await _flutterBlue.startScan(timeout: Duration(seconds: 2));
 
     _scanSubscription = _flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
@@ -42,7 +42,7 @@ class BLEService {
       }
     });
 
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 2));
     await _flutterBlue.stopScan();
 
     if (_targetDevice != null && write) {
