@@ -103,28 +103,49 @@ class BLEService {
   }
 
   List<int> _convertProfileToData(BusinessCard profile) {
-    // Convert the firstName to a list of ASCII values (byte array)
-    List<int> firstNameBytes = ascii.encode(profile.firstName);
-    return firstNameBytes;
+    // Concatenate all fields with semicolons
+    String concatenatedProfile = '${profile.firstName};'
+        '${profile.lastName};'
+        '${profile.phoneNumber};'
+        '${profile.email};'
+        '${profile.linkedIn};'
+        '${profile.company};'
+        '${profile.position};';
+
+    // Convert the concatenated string to a list of ASCII values (byte array)
+    List<int> profileBytes = ascii.encode(concatenatedProfile);
+    return profileBytes;
   }
 
   BusinessCard? _convertDataToBusinessCard(List<int> value) {
     try {
-      // Decode the byte array into an ASCII string for the first name
-      String asciiFirstName = ascii.decode(value);
+      // Decode the byte array into a concatenated ASCII string
+      String concatenatedProfile = ascii.decode(value);
 
-      // Create the BusinessCard with the ASCII first name and placeholders for other fields
+      // Split the concatenated profile at each semicolon
+      List<String> profileComponents = concatenatedProfile.split(';');
+
+      // Verify that we have all expected components (except timestamps)
+      if (profileComponents.length < 7) {
+        print('Incomplete data received.');
+        return null;
+      }
+
+      // Create and return a new BusinessCard with current timestamps
       return BusinessCard(
-        firstName: asciiFirstName,
-        lastName: 'Placeholder',
-        phoneNumber: 'Placeholder',
-        email: 'Placeholder',
+        firstName: profileComponents[0],
+        lastName: profileComponents[1],
+        phoneNumber: profileComponents[2],
+        email: profileComponents[3],
+        linkedIn: profileComponents[4],
+        company: profileComponents[5],
+        position: profileComponents[6],
         createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         updatedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
       );
     } catch (e) {
       print('Error converting data: $e');
-      return null; // Return null to indicate an error occurred during conversion
+      return null;
     }
   }
 
