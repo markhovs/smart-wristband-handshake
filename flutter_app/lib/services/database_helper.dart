@@ -139,4 +139,16 @@ class DatabaseHelper {
       return BusinessCard.fromMap(Map<String, dynamic>.from(maps[i]));
     });
   }
+
+  // Delete a specific contact card
+  Future<void> deleteContactCard(int? id) async {
+    final db = await instance.database;
+    if (id != null) {
+      await db.delete(
+        tableContacts,
+        where: '$columnId = ?',
+        whereArgs: [id],
+      );
+    }
+  }
 }

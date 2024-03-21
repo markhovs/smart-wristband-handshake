@@ -6,7 +6,7 @@
     <!-- If targeting SDK 31 (Android 12) or higher, use ACCESS_FINE_LOCATION instead -->
     <!-- <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
     <application
-        android:label="flutter_app"
+        android:label="smart_wristband"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
